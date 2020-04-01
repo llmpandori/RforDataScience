@@ -38,6 +38,19 @@ What is tidy data?
   2. Each obs forms a row
   3. Each type of obs unit (value) forms a table
   
+### ggplot2
+gg = grammar of graphics
+Quickly visualize data in flexible manner
+
+### dplyr
+filter() keep rows matching criteria
+select() pick columns by name
+arrange() reorder rows...
+see notes on Canvas
+
+### Pipes = %>%
+Takes something and puts it through a bunch of functions
+Can string together
 
 
 
