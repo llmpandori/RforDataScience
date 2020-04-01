@@ -1,0 +1,49 @@
+---
+title: "Intro. to Tidyverse - 04012020"
+author: "L. Pandori"
+date: "4/1/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Process
+cleaning --> wrangling --> descriptive stats --> modeling --> reporting
+(non-linear process, course focuses on first 3 steps)
+
+### Breakout session talk
+Some folks have MCRS class experience, others brutalist approach
+Need practice -- using R consistently
+Data vis -- intuitive plots
+Manipulation -- hard to see, can't do in E*cel for large datasets
+
+### Outcomes
+Confidence
+Build resource bank -- Canvas page
+
+### What is Tidyverse?
+Set of 20 packages, all use same data format (dev by Hadley Wickam)
+Import (readr)
+Tidy
+  Transform (dplyr, broom, XX?)
+  Visualize (ggplot2, ggmap)
+  Model (linear models)
+Communicate 
+  Markdown (repeatable science)
+  
+What is tidy data?
+  1. Each var forms a column
+  2. Each obs forms a row
+  3. Each type of obs unit (value) forms a table
+  
+
+
+
+
+
+
+
+
+
