@@ -43,10 +43,6 @@ nrow(mpg)
 
 3. The drv variable describes the type of drive train
 
-```{r}
-?mpg
-```
-
 4. Make a scatterplot of hwy (highway mpg) vs cyl (# cylinders)
 
 ```{r}
