@@ -1,0 +1,25 @@
+---
+title: "Ch4_Workflow_Scripts_Ch6_Projects"
+author: "L. Pandori (adapted from Wickham & Grolemund)"
+date: "4/14/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Script editor : RStudio
+See online text for more info (already familiar w RStudio and company)
+
+## Projects
+Never save workspace upon exit -- everything live should be saved as scripts/markdown files
+
+Use project to avoid having to set wd
+
+Have distinct project for each da project
+  Keep all files w/in wd folder
+  Save outputs there
+  Only use relative paths -- not absolute
+  
+  
