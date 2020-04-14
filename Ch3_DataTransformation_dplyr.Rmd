@@ -1,0 +1,309 @@
+---
+title: "Ch3_DataTransformation_dplyr"
+author: "L. Pandori (adapted from Wickham & Grolemund)"
+date: "4/7/2020"
+output: html_document
+---
+## Intro & Prerequisites
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# Load library
+library(tidyverse) # ggplot2 and dplyr
+library(nycflights13) #dataset
+flights <- flights
+# ?flights # for more info
+```
+
+Look at warning messages...if dplyr has overwritten a function from base R, you can still use it by specifying *package::function*
+
+NYC Flights 13 - flight info for 336k flights from NYC in 2013
+
+Data types - 
+ * int = integers
+ * dbl = double/real numbers
+ * chr = character vectors/strings
+ * dttm = date-time
+ * lgl = logical (vectors w/ only TRUE or FALSE)
+ * fctr = factor (categorical var with fixed possible values)
+ * date = date
+
+dplyr basics - 
+
+Format is *function(df, what to do)*, result in new df
+Fns don't change df...to save as new use *newdf <- fn(olddf, XX)*
+
+To save the 
+ * filter() = pick obs by values
+ * arrange() = reorder rows
+ * select() = pick variables by names
+ * mutate() = create new variables w f(n) of existing variables
+ * summarize() = collapse many values to summarry
+
+All can be used with group_by(), which makes functions operate on each group
+
+## filter() = pick obs by varibles
+
+Comparisons: == (equals), >, <, >=, <=, != (not equal)
+*note* when doing arithmetic, use near() instead of == 
+
+Ex) 
+```{r}
+sqrt(2)^2 == 2
+near(sqrt(2)^2, 2)
+```
+
+Logical operators: & (and), | (or), ! (not)
+*note* you can't use these operators without repeating arguments. As an alternative, use %in%
+
+```{r}
+filter(flights, month == 11|12) #doesn't work (see month = 1 in row 1)
+filter(flights, month == 11 | month == 12) # works
+filter(flights, month %in% c(11,12)) # works, more efficient
+```
+
+DeMorgan's Law
+  * !(x & y) = !x | !y
+  * !(x | y) = !x & !y
+  
+Missing Values
+NAs = missing values 
+
+To determine if values is missing, use *is.na()*
+
+Exercises: 
+1. Find all fights that meet criteria listed in book
+
+```{r}
+# a
+head(filter(flights, arr_delay >= 60))
+# b
+head(filter(flights, dest %in% c('IAH', 'HOU')))
+# c
+head(filter(flights, carrier %in% c('UA', 'AA', 'DL')))
+# d
+head(filter(flights, month %in% c('7', '8', '9')))
+# e
+head(filter(flights, dep_delay <= 0 & arr_delay > 120))
+# f 
+head(filter(flights, dep_delay >= 60 & arr_delay <= dep_delay - 30))
+# g
+head(filter(flights, dep_time == 2400 | dep_time <= 600))
+```
+
+2. between() operator - (x, left, right)
+can be used to simplify observations like #d in ex above
+filter(flights, between(month, 7,9))
+
+3. 8255 flights have a missing dept_time. They might represent cancelled flights, bc they are missing an arrival time & flight duration.
+
+```{r}
+nrow(filter(flights, is.na(dep_time)))
+```
+
+4. N^0 and N*0 are not missing because any number ^0 = 1 and any number x 0 = 0. 
+
+## arrange() - to order rows
+Works like filter() arguments, but just changes order
+If > 1 argument, additional arugments break ties
+
+Exercises
+1. Sort all missing values to start of dataframe
+
+```{r}
+head(arrange(flights, desc(is.na(dep_time), dep_time)))
+
+```
+
+2. Find most delayed flight and earliest departing flight
+
+```{r}
+# find most delayed flight (1301 min late)
+head(arrange(flights, desc(dep_delay)))
+# find least delayed flight (43 min early)
+head(arrange(flights, dep_delay))
+```
+
+3. Fastest flight = 20 mins
+
+```{r}
+head(arrange(flights, air_time))
+```
+
+4. Longest travel distance = 4983 miles
+Shortest = 17 miles
+
+```{r}
+# shortest distance
+head(arrange(flights, distance))
+# longest distance
+head(arrange(flights, desc(distance)))
+```
+
+## select()
+Narrow df to columns of interest
+ * -(list) to exclude
+ * () to include
+ * (:) to include between
+
+Helper functions: 
+ * starts_with ('abc')
+ * ends_with ('abc')
+ * contains ('abc')
+ * matches (*regular expression - see ch11*)
+
+To re-name variables, use rename() -- not select()
+  Preserves other variables as well 
+  ex) rename(flights, tail_num = tailnum)
+  
+To move vars of interest to L side of df...
+  select(*df*, *v1*, *v2* everything())
+  
+Exercises: 
+
+1. Multiple ways to get the same columns
+
+```{r}
+# way 1
+head(select(flights, dep_time, dep_delay, arr_time, arr_delay))
+# way 2
+head(select(flights, starts_with('dep_'), starts_with('arr_')))
+```
+
+2. If var name is included more than once, it will only be included once
+
+3. one_of() function is retired
+any_of() - selects all that match (OK to have ones that may not exist)
+all_of() - selects any that match 
+
+4. contains() is not case sensitive
+
+## mutate() adds new vars to R side of df
+If you only want to keep new vars, use transmute()
+
+Creation functions (input and output are vectors)
+ * Arithmetic operators = +, -, *, /, ^
+ * Modular arithmetic
+    %/% - integer division
+    %% - remainder
+ * Logs - log(*ln*), log2(*base2*), log10(*base10*)
+ * Offsets - lead(*leads by x*), lag(*lags by x*)
+ * Cumulative/rolling agregates
+    cumsum(), cumprod(), cummin(), cummax(), cummean()
+    *For rolling aggregates, try RcppRoll package*
+ * Logical comparisons: >, <=, >=, <, != etc.
+ * Ranking
+    # smallest to largest min_rank(*df$col*)
+    # largest to smallest min_rank(desc(*df$col*))
+
+Exercises
+
+1. convert dep_time and arr_time to mins since midnight #nope
+
+```{r}
+flights$dep_time_mm <- mutate(flights, dep_time %/% 100 * 60 + dep_time %% 100, dep_time)
+```
+  
+## summarize() - grouped summaries
+group_by() to specify groups to summarize obs in
+
+Functions: 
+ * Measures of location: mean(x), median(x)
+ * Measures of spread: sd(x), IQR(x), mad(x) - median absolute deviation
+ * Measures of rank: min(x), quantile(x, *0.25*), max(x)
+ * Measures of position: first(x), nth(x,*#*), last(x)
+ * Number of unique observations: n_distinct()
+
+## %>% = pipe, combines operations
+Can combine, for example
+1. Select/group data of interest *flights %>% group_by(dest) %>%*
+2. Calculate summary *summarize(count = n(), dist = mean(distance, na.rm = TRUE) %>%*
+3. Filter to remove outliers *filter(count > 20, deat != 'HNL')*
+
+*na.rm = TRUE* removes missing values before calculation
+*count(n())* or *sum(!is.na(x))* give sample size
+
+## Grouping multiple variables
+*group_by()*
+to ungroup, use *ungroup()*
+
+Exercises: 
+
+1. 
+
+```{r}
+# 15 min early 50% of the time, 15 min late 50% of the time
+min15 <- flights %>%
+          group_by()
+
+# always 10 min late
+late10 <- filter(flights, arr_delay == 10)
+unique(late10$arr_delay)
+
+# 30 min early 50% of the time, 30 min late 50% of the time
+
+
+# 99% on time, 1% 2 hrs late
+```
+
+2. Same output, without using count()
+
+```{r}
+# original code
+not_cancelled <- flights %>%
+  filter(!is.na(dep_delay), !is.na(arr_delay))
+not_cancelled %>% count(dest)
+
+# new way w/o count()
+not_cancelled %>% 
+  group_by(dest) %>%
+  summarize(n = length(arr_time))
+
+# original code
+not_cancelled %>% count(tailnum, wt = distance)
+
+# new way w/o count()
+not_cancelled %>%
+  group_by(tailnum) %>%
+  summarize(n = sum(distance))
+```
+
+3. In defining cancelled flights, dep_delay is most important.
+
+4. Look at # of cancelled flights per day -- pattern?
+
+```{r}
+# find # of cancelled flights per day
+cancelled <- flights %>%
+  filter(is.na(arr_delay), is.na(dep_delay)) %>%
+  group_by(date(time_hour)) %>%
+  summarize(n = length(arr_delay))
+# look at top 10 observations
+# no distinguishable pattern (just from eyeball)
+```
+
+5. Which carrier has worst delays? - of course, it's Frontier
+
+```{r}
+# only group by carrier
+carrierdelay <- flights %>% 
+  group_by(carrier) %>%
+  summarize(mean_delay = mean(arr_delay, na.rm = TRUE),
+            sd_delay = sd(arr_delay, na.rm = TRUE))
+```
+
+6. For each plane, count # of obs before first delay > 1 hr
+!!! I can't figure this one out yet !!!
+```{r}
+obs <- flights %>%
+  group_by(tailnum) %>% # group by plane
+  arrange(tailnum, year, month, day) %>% # sort by yr, mo, day
+  summarize(days = rank(arr_delay > 60))
+```
+
+7. The sort argument to count() can replace count followed by arrange
+
+## Group mutates and filters
+
+
+
