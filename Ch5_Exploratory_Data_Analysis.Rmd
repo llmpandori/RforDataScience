@@ -1,0 +1,131 @@
+---
+title: "Ch5_Exploratory_Data_Analysis"
+author: "L. Pandori (adapted from Wickham & Grolemund)"
+date: "4/20/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Intro
+Exploratory data analysis = use vis & transformation to explore data in a systematic way with goals: 
+ * generate q's
+ * search for answers
+ * use what you learn to refine q's or generate new q's
+ 
+Possible guiding q's
+ * what variation occurs?
+ * what covariation occurs?
+
+Definitions: 
+1. variable - measured quantity/quality/property
+2. value - state of var when measured
+3. obs/case - set of measurements made under similar conditions
+4. tabular data - tidy if each value in own cell, each var in column, each obs in row
+
+## Variation
+
+Visualizing distributions: 
+  - barplot if categorical (geom_bar)
+  - histogram if continuous (geom_histogram)
+  (use geom freq_poly for multiple histograms on same plot)
+
+Think about 
+  * which values most common & why
+  * which rare & why
+  * notice unusual patterns & why
+
+Clusters of similar obs indicate subgroups in data 
+
+What about outliers? (make bars thick to see more clearly)
+ * repeat analysis w/ and w/o outliers 
+
+Exercises: 
+1. explore x (length, mm), y (width), z (depth) variables of diamonds
+ * they are continuous
+```{r}
+library(tidyverse)
+ggplot(data = diamonds) + 
+  geom_histogram(mapping = aes(x = x), fill = 'blue', alpha = 0.5) + 
+  geom_histogram(mapping = aes(x = y), fill = 'green', alpha = 0.5) +
+  geom_histogram(mapping = aes(x = z), fill = 'yellow', alpha = 0.5) + 
+  coord_cartesian(xlim = c(0,10)) + 
+  xlab(label = 'length, width, depth (mm)')
+  theme_bw()
+```
+
+2. explore price
+```{r}
+ggplot(data = diamonds, mapping = aes(x = price)) + 
+  geom_histogram(binwidth = 1000) +
+  theme_bw()
+```
+
+3. how many diamonds are 0.99 carat? 23
+how many 1 carat? 1558
+
+```{r}
+ggplot(data = diamonds, mapping = aes(x = carat)) + 
+  geom_histogram(binwidth = 0.01) +
+  theme_bw()
+
+nrow(diamonds %>% filter(carat == 1))
+nrow(diamonds %>% filter(carat == 0.99))
+```
+
+4. exploratory question -- done in console
+
+## Dealing with missing/unusual values
+2 options: 
+ * drop entire row with filter (not recommended)
+ * replace with NAs (recommended) with mutate
+ ex) df2 <- df1 %>% mutate(var = ifelse(condition, NA, var))
+ 
+ Keep in mind what missing values mean (like cancelled flights)
+ 
+ Exercises: 
+ 1. NAs are not counted in histogram, but make own column in barplot
+ 2. na.rm = TRUE discards NAs from calculation of summary stats (in mean() and sum())
+ 
+## Covariation
+Describes variation b/w vars
+
+Categorical x continuous - look at boxplots
+  * IQR = length of box (25%tile to 75%tile), middle is median (50%tile)
+  * whiskers are 1.5 x IQR
+  * outliers as points
+
+Can re-order boxplots using mapping = aes(x = reorder(x = x, y = y, FUN = median), y = y)
+
+Exercises - skipped, I feel practiced in boxplot wrangling
+
+## 2 Categorical Variables
+Count # of obs for each combination - geom_count() works well
+Covariation appears as strong correlation b/w x and y values
+
+```{r}
+ggplot(data = diamonds, mapping = aes(x = cut, y = color)) + 
+  geom_count() +
+  theme_bw()
+
+# or
+
+ggplot(data = diamonds %>% count(color, cut), mapping = aes(x = color, y = cut)) + 
+  geom_tile(mapping = aes(fill = n))
+```
+
+## 2 Continuous Variables
+Scatterplot w/ geom_point()
+Covariation indicated by linear relationship b/w points
+
+## Patterns & Models
+Questions to ask about patterns: 
+  * Due to chance?
+  * How to describe relationship implied?
+  * How strong?
+  * Do other vars affect relationship?
+  * Does relationship change if viewed by group?
+
+
