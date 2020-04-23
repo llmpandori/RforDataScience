@@ -1,0 +1,123 @@
+---
+title: "Ch789_Input_Tidying"
+author: "L. Pandori (adapted from Wickham & Grolemund)"
+date: "4/23/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Ch 7 - Tibbles
+Use over df b/c: 
+ * when called, gives 10x10 output
+ * when subsetted, always returns tibble
+
+```{r}
+# more info
+vignette('tibble')
+```
+
+## Ch 8 - Data import w/ readr
+name <- read_csv('file.csv')
+ * add *na = 'navalue'* to specify NAs
+
+# Parsing a vector - tell R how to treat a column (what type of data?)
+parse*_(character vector to parse, na = 'navalue')
+ * logical, integer
+ * double (strict numeric)
+ * number (flexible numeric) - ignores things before/after # (ex - %$)
+ * character - gets complicated w/ older files (see txt pg 133)
+ * factor - cat vars w known set of values
+ * datetime, date, time - specify format (see below)
+    year - %y (2 digit), %Y (4 digit)
+    month - %m (2 digits), %b (abbr name), %B (full name)
+    day - %d (2 digits), %e (opt leading space)
+    time - %H (hour 0-23), %I (hour 0-12, must be used with %p), 
+           %p (am/pm), %M (min), %S (integer seconds), 
+           %OS (real seconds), %Z (time zone - see pg 254), 
+           %z (offset from UTC)
+
+# Parsing a file
+readr automatically parses after analyzing first 1k rows, but can be overridden 
+
+name <- read_csv('file.csv',
+        col_types = cols(
+        x = col_*(),
+        y = col_*())
+        
+?? When do you use parse_*() then? - when data are already in R
+
+Write a file
+*write_csv(tibble, 'name.csv')*
+for Excel specifically
+*write_excel_csv(tibble, 'name.csv')*
+to keep important parsing
+*write_rds(tibble, 'name.rds')*
+
+## Ch 9 - Tidy Data w Tidyr
+
+Tidy data - long format (easy to work w/)
+ * each var in own column
+ * each obs in own row
+ * each value in own cell 
+ 
+# Spreading (break 1 col into 2) and gathering (make 2 col into 1)
+df %>% gather(col1, col2, key = newcolname, value = variabletospread)
+spread(df, key = coltosplit, value = variabletogather)
+
+Exercises:
+
+1.
+```{r}
+library(tidyverse)
+stocks <- tibble(
+  year = c(2015,2015,2016,2016),
+  half = c(1,2,1,2),
+  return = c(1.88, 0.59, 0.92, 0.17))
+
+stocks2 <- spread(data = stocks, key = year, value = return)
+stocks2 <- gather(data = stocks2, year, return, '2015':'2016')
+
+```
+
+2. Why does this code fail? needs backticks around 1999 and 2000
+
+```{r}
+# fail 
+table4a %>% 
+  gather(1999 , 2000, key = 'year', value = 'cases')
+# fix
+table4a %>% 
+  gather('1999' , '2000', key = 'year', value = 'cases')
+```
+
+3. Need to spread the key column - so that age & height are 2 dif columns for each observation (person)
+
+4. Need to gather - so that sex, preg and whatever the male and female obs are are separate
+
+# Separating & Pull
+Use separate when one column contains 2 observations
+Ex) 258/89 --> 258 |  89
+df %>% separate(column, into = c('newcol1', 'newcol2'), 
+        sep = 'delimiter',
+        convert = T(if want new cols have dif type)/F (presrve type))
+
+Use separate to get first/last values of column
+df %>% separate(column, into = c('newcol1', 'newcol2'),
+        sep = # (starts with 1 on L and -1 on R))
+
+Use unite to combine multiple cols into single col (inverse of separate)
+
+df %>% unite(newcol, col1, col2)
+   where col1 and col2 are cols you want to unite 
+   
+# Missing Values
+explicit - (presence of an absence) values w/ NA or other indication
+implicit - (absence of a presence) missing row that fits a pattern
+
+# TB Case Study Dataset
+
+
+
