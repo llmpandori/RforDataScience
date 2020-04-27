@@ -61,12 +61,12 @@ View(nyc_squirrels)
  
 ##### Squirrel Data Showdown Challenge #####
   # Step 1 -  Load data (practice loading the nyc_squirrels 2 csv)
-  nyc_squirrels <- read_csv('nyc_squirrels2.csv')
+
+  
   
   # Step 2 - Create a date2 column that contains formatted dates
   # How do you check your work?
-  nyc_squirrels <- nyc_squirrels %>%
-    mutate(date2 = mdy(nyc_squirrels$date))
+
   
   
   # Step 3 - Separate the original date column into month, day and year? (try without lubridate) and then unite them.
@@ -75,11 +75,6 @@ View(nyc_squirrels)
   
   # Step 4 - Change the location column into 2 separate colunns with the headings 'above ground' and 'ground plane' and make the values logical statements (true/false)
   
-  location_squirrels <- nyc_squirrels %>%
-    pivot_wider(names_from = location,
-                names_to = c('ground', 'aboveground'),
-                values_from = location,
-                values_fill = list(location = 'False'))
   
   
   # Step 5 - Can you create a plot of your choice and post it as a reply to the thread @PandoriEco
