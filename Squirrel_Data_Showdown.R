@@ -10,55 +10,73 @@
 # Link to NYC Squirrel Census Dataset Information: https://github.com/rfordatascience/tidytuesday/tree/master/data/2019/2019-10-29
 
 ##### Data prep and package upload #####
-#Clear workspace
-rm(lists=ls())
 
 # Load libraries (add others if you like)
 library(tidyverse) 
+library(lubridate)
 
 # Load data (copypasta from link)
 nyc_squirrels <- read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-10-29/nyc_squirrels.csv")
 
 # Write a copy for upload practice
 write_csv(nyc_squirrels, 'nyc_squirrels2.csv')
+remove(nyc_squirrels)
 
 ##### Skills Practice (upload, tidy, write) #####
+# Upload dataset from csv
+nyc_squirrels <- read_csv('nyc_squirrels2.csv')
 
 # This dataset has columns with various formats 
 View(nyc_squirrels)
 
-  # Some have dates (note they aren't yet formatted as dates)
-  typeof(nyc_squirrels$date)
-  # Most are pretty good 
-  typeof(nyc_squirrels$running) # this has only true/false
-  typeof(nyc_squirrels$zip_codes) # this is #'s
-  typeof(nyc_squirrels$primary_fur_color) # this is colors
+  # Some are parsed incorrectly
+  class(nyc_squirrels$date)
   
-# Remove dataset to practice loading
-remove(nyc_squirrels)
+  # Most are parsed accurately
+  class(nyc_squirrels$running) # this has only true/false
+  class(nyc_squirrels$zip_codes) # this is #'s
+  class(nyc_squirrels$primary_fur_color) # this is colors
   
 # Use parsing to designate column types when uploading (many ways)
 
-# Parsing way # 1 - write by hand as you upload
-  nyc_squirrels2 <- read_csv('nyc_squirrels2.csv',
-                        col_types = (cols(
-                            date = col_date(format = '%m%d%Y')
-                             )))
-  # check if type changed
-  typeof(nyc_squirrels2$date)
+# Parsing way # 1 - after loading data
   
-  # parse
-  parse_date(nyc_squirrels2, date)
+  # note - as_date doesn't work well as mdy with a numeric col without   an established delimieter
+  nyc_squirrels <- nyc_squirrels %>%
+    mutate(date2 = mdy(nyc_squirrels$date))
   
-  # test if this works
-  head(nyc_squirrels2$date)
-  
-  
-  nyc_squirrels2 <- read_csv("nyc_squirrels2.csv", 
-                             col_types = cols(date = col_date(format = "%m/%d/%Y")))
-  
-  
+  # check work
+  class(nyc_squirrels$date2)
 
-
-# Parwing way # 3 - do it with an add-in
-  # click dataset --> import --> 
+# Parsing way # 2 - while loading data 
+  # nyc_squirrels2 <- read_csv('nyc_squirrels2.csv',
+                             # col_types = cols(
+                             # date = mdy(date)))
+  
+# Parsing way # 3 - in loading window 
+  # file (click) --> import dataset --> adj --> copy/paste code
+  # doesn't work w dates in this example, but let's change a col type
+  
+##### 4 Important Tidyr Functions #####
+  # LL code here 
+  
+  
+##### Squirrel Data Showdown Challenge #####
+  # Step 1 -  Load data (practice loading nyc_squirrels 2)
+  
+  
+  
+  # Step 2 - Create a date column
+  
+  
+  
+  # Step 3 - There are 3 columns which pertain to fur color (primary, highlight and combo primary/highlight). Can you create a more clear version of the combo column that would lend itself to a nice plot?
+  
+  
+  
+  
+  # Step 4 - Can you separate the original date column into month, day and year? (try without lubridate)
+  
+  
+  
+  # Step 5 - Can you create a plot of your choice and post it as a reply to the thread @PandoriEco
