@@ -57,26 +57,31 @@ View(nyc_squirrels)
   # file (click) --> import dataset --> adj --> copy/paste code
   # doesn't work w dates in this example, but let's change a col type
   
-##### 4 Important Tidyr Functions #####
-  # LL code here 
-  
-  
+##### 4 Important Tidyr Functions with LL #####
+ 
 ##### Squirrel Data Showdown Challenge #####
-  # Step 1 -  Load data (practice loading nyc_squirrels 2)
+  # Step 1 -  Load data (practice loading the nyc_squirrels 2 csv)
+  nyc_squirrels <- read_csv('nyc_squirrels2.csv')
+  
+  # Step 2 - Create a date2 column that contains formatted dates
+  # How do you check your work?
+  nyc_squirrels <- nyc_squirrels %>%
+    mutate(date2 = mdy(nyc_squirrels$date))
+  
+  
+  # Step 3 - Separate the original date column into month, day and year? (try without lubridate) and then unite them.
   
   
   
-  # Step 2 - Create a date column
+  # Step 4 - Change the location column into 2 separate colunns with the headings 'above ground' and 'ground plane' and make the values logical statements (true/false)
   
-  
-  
-  # Step 3 - There are 3 columns which pertain to fur color (primary, highlight and combo primary/highlight). Can you create a more clear version of the combo column that would lend itself to a nice plot?
-  
-  
-  
-  
-  # Step 4 - Can you separate the original date column into month, day and year? (try without lubridate)
-  
+  location_squirrels <- nyc_squirrels %>%
+    pivot_wider(names_from = location,
+                names_to = c('ground', 'aboveground'),
+                values_from = location,
+                values_fill = list(location = 'False'))
   
   
   # Step 5 - Can you create a plot of your choice and post it as a reply to the thread @PandoriEco
+  
+
